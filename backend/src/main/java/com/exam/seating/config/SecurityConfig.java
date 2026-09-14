@@ -70,7 +70,8 @@ public class SecurityConfig {
                 // 1. CORS Pre-flight Options Requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // 2. Public Endpoints
+                // 2. Public Endpoints & Health Check (for uptime monitoring / cron-jobs)
+                .requestMatchers("/", "/api/health/**", "/api/ping/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/seating/student/**").permitAll()
 
