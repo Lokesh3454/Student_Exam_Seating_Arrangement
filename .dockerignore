@@ -1,10 +1,11 @@
 .git
-.gitignore
 backend/target/
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+backend/src/main/resources/static/
 sample_bulk_data/
 scratch/
 *.md
 *.ps1
+*.log

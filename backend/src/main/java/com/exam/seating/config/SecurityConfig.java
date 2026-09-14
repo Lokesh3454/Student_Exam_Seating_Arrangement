@@ -70,8 +70,10 @@ public class SecurityConfig {
                 // 1. CORS Pre-flight Options Requests
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // 2. Public Endpoints & Health Check (for uptime monitoring / cron-jobs)
-                .requestMatchers("/", "/api/health/**", "/api/ping/**").permitAll()
+                // 2. Public Static Assets & Angular SPA Views
+                .requestMatchers(HttpMethod.GET, "/", "/index.html", "/favicon.ico", "/*.js", "/*.css", "/*.map", "/*.txt", "/assets/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/login", "/dashboard/**", "/students/**", "/exams/**", "/halls/**", "/faculty/**", "/seating/**", "/attendance/**", "/reports/**", "/incidents/**", "/hod/**", "/audit-logs/**").permitAll()
+                .requestMatchers("/api/health/**", "/api/ping/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/seating/student/**").permitAll()
 

@@ -29,7 +29,6 @@ backend/.mvn/wrapper/maven-wrapper.jar
 # Frontend (Angular / Node.js)
 **/node_modules/
 **/.angular/
-**/dist/
 frontend/dist/
 frontend/.angular/cache/
 npm-debug.log*
@@ -38,3 +37,7 @@ yarn-error.log*
 
 # Scratch & Temporary Testing Scripts
 scratch/
+
+# Allow committed static resources (Angular build bundled into backend)
+!backend/src/main/resources/static/
+!backend/src/main/resources/static/**

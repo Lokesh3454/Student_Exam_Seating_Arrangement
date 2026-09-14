@@ -1,24 +1,48 @@
-# Multi-stage Docker build for Spring Boot Backend (Java 21)
+# ===================================================================
+# Multi-stage Dockerfile: Angular Frontend + Spring Boot Backend
+# Result: Single deployable image - Angular UI served from Spring Boot
+# ===================================================================
 
-# Stage 1: Build JAR using Maven
-FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
-WORKDIR /app
+# Stage 1: Build Angular Frontend
+FROM node:18-alpine AS frontend-build
+WORKDIR /app/frontend
 
-# Copy Maven descriptor and source code
+# Copy package files and install dependencies
+COPY frontend/package*.json ./
+RUN npm ci --omit=dev 2>/dev/null || npm install
+
+# Copy source and build production bundle
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Build Spring Boot Backend JAR
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS backend-build
+WORKDIR /app/backend
+
+# Copy Maven descriptor and resolve dependencies first (better cache)
 COPY backend/pom.xml .
+RUN mvn dependency:go-offline -q
+
+# Copy backend source
 COPY backend/src ./src
 
-# Build production executable JAR without running tests
-RUN mvn clean package -DskipTests
+# Copy the built Angular files into Spring Boot static resources
+COPY --from=frontend-build /app/frontend/dist/smart-exam-seating-frontend/ ./src/main/resources/static/
 
-# Stage 2: Minimal JRE Runtime
+# Package the fat JAR (includes static Angular assets)
+RUN mvn package -DskipTests -q
+
+# Stage 3: Minimal JRE Runtime
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
-# Copy built JAR from builder stage
-COPY --from=build /app/target/*.jar app.jar
+# Copy the executable Spring Boot JAR
+COPY --from=backend-build /app/backend/target/*.jar app.jar
 
-# Render assigns port dynamically via $PORT
+# Memory optimization for Render free tier (512MB RAM)
+ENV JAVA_TOOL_OPTIONS="-Xmx384m -Xms128m -XX:+UseG1GC -XX:MaxRAMPercentage=75"
+
+# Render injects PORT dynamically
 ENV PORT=8080
 EXPOSE 8080
 
