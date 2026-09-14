@@ -7,9 +7,9 @@
 FROM node:18-alpine AS frontend-build
 WORKDIR /app/frontend
 
-# Copy package files and install dependencies
+# Copy package files and install ALL dependencies (devDeps needed for ng build)
 COPY frontend/package*.json ./
-RUN npm ci --omit=dev 2>/dev/null || npm install
+RUN npm ci
 
 # Copy source and build production bundle
 COPY frontend/ ./
