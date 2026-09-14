@@ -53,6 +53,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- H2 Database (Enables zero-setup cloud deploy / fallback) -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Lombok (Reduces boilerplate) -->
         <dependency>
             <groupId>org.projectlombok</groupId>

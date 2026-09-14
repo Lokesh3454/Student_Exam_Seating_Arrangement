@@ -309,11 +309,13 @@ public class SeatingArrangementServiceImpl implements SeatingArrangementService 
                 .distinct()
                 .count();
 
-        auditLogService.logCurrentUser(
-                "GENERATE_SEATING",
-                "Exam #" + exam.getId() + " (" + exam.getExamName() + ")",
-                "Generated seating arrangement: " + arrangements.size() + " students across " + hallsUsed + " halls using strategy " + strategy
-        );
+        if (auditLogService != null) {
+            auditLogService.logCurrentUser(
+                    "GENERATE_SEATING",
+                    "Exam #" + exam.getId() + " (" + exam.getExamName() + ")",
+                    "Generated seating arrangement: " + arrangements.size() + " students across " + hallsUsed + " halls using strategy " + strategy
+            );
+        }
 
         return SeatingGenerationResponseDto.builder()
                 .examId(exam.getId())

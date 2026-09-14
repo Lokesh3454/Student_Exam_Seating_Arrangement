@@ -336,17 +336,21 @@ public class StudentServiceImpl implements StudentService {
             }
             summary.setHallAllocations(allocations);
 
-            auditLogService.logCurrentUser(
-                    "BULK_IMPORT_STUDENTS_AND_SEATING",
-                    "Exam #" + exam.getId() + " (" + exam.getExamName() + ")",
-                    "Bulk imported " + summary.getSuccessfullyImported() + " students and allocated seating across " + allocations.size() + " hall(s) with 5x3 capacity overflow."
-            );
+            if (auditLogService != null) {
+                auditLogService.logCurrentUser(
+                        "BULK_IMPORT_STUDENTS_AND_SEATING",
+                        "Exam #" + exam.getId() + " (" + exam.getExamName() + ")",
+                        "Bulk imported " + summary.getSuccessfullyImported() + " students and allocated seating across " + allocations.size() + " hall(s) with 5x3 capacity overflow."
+                );
+            }
         } else {
-            auditLogService.logCurrentUser(
-                    "BULK_IMPORT_STUDENTS",
-                    "Students (" + summary.getSuccessfullyImported() + " imported)",
-                    "Bulk import completed. Success: " + summary.getSuccessfullyImported() + ", Failed: " + summary.getFailedRows()
-            );
+            if (auditLogService != null) {
+                auditLogService.logCurrentUser(
+                        "BULK_IMPORT_STUDENTS",
+                        "Students (" + summary.getSuccessfullyImported() + " imported)",
+                        "Bulk import completed. Success: " + summary.getSuccessfullyImported() + ", Failed: " + summary.getFailedRows()
+                );
+            }
         }
 
         return summary;
