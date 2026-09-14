@@ -1,0 +1,40 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.tmp
+*.log
+
+# IDE & Editor Files
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# Backend (Spring Boot / Maven / Java)
+**/target/
+**/*.class
+**/*.jar
+**/*.war
+**/*.nar
+**/*.ear
+**/*.zip
+**/*.tar.gz
+**/*.rar
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Frontend (Angular / Node.js)
+**/node_modules/
+**/.angular/
+**/dist/
+frontend/dist/
+frontend/.angular/cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Scratch & Temporary Testing Scripts
+scratch/
