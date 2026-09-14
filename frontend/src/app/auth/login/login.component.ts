@@ -9,279 +9,353 @@ import { AuthService } from '../../core/services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
-    <div class="login-wrapper d-flex align-items-center justify-content-center py-5 position-relative overflow-hidden">
-      <!-- Ambient Background Glow Orbs -->
-      <div class="ambient-orb ambient-orb-1"></div>
-      <div class="ambient-orb ambient-orb-2"></div>
-      <div class="ambient-orb ambient-orb-3"></div>
+    <div class="login-page">
+      <!-- Left Panel: Background Image with Overlay Text -->
+      <div class="login-hero" role="img" aria-label="University examination hall">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i class="bi bi-mortarboard-fill me-2"></i>Smart Campus
+          </div>
+          <h1 class="hero-title">Intelligent Exam<br>Seating System</h1>
+          <p class="hero-subtitle">Automated hall allocation, live attendance tracking, and comprehensive examination management — all in one platform.</p>
+          <div class="hero-stats">
+            <div class="stat-pill"><i class="bi bi-building me-1"></i>Multi-Hall</div>
+            <div class="stat-pill"><i class="bi bi-people me-1"></i>All Roles</div>
+            <div class="stat-pill"><i class="bi bi-shield-check me-1"></i>Secure JWT</div>
+          </div>
+        </div>
+      </div>
 
-      <div class="container position-relative" style="z-index: 2;">
-        <div class="row justify-content-center">
-          <div class="col-md-7 col-lg-5 col-xl-4">
-            <!-- Glass Login Card -->
-            <div class="card shadow-2xl border-0 rounded-4 overflow-hidden glass-login-card fade-in">
-              <!-- Top Header with Brand Gradient -->
-              <div class="card-header text-center pt-4 pb-3 border-0 bg-transparent">
-                <div class="brand-shield-wrapper mx-auto mb-3 shadow-glow">
-                  <i class="bi bi-shield-lock-fill fs-2 text-white"></i>
-                </div>
-                <h3 class="fw-bold mb-1 text-dark tracking-tight brand-font">Welcome Back</h3>
-                <p class="text-secondary small mb-0">Smart Examination & Seating Management</p>
-              </div>
+      <!-- Right Panel: Login Form -->
+      <div class="login-form-panel">
+        <div class="login-form-inner">
+          <!-- Brand Logo -->
+          <div class="brand-logo-wrap mb-4">
+            <div class="brand-shield">
+              <i class="bi bi-shield-lock-fill text-white fs-3"></i>
+            </div>
+            <div>
+              <div class="brand-name">ExamSeat Pro</div>
+              <div class="brand-sub">Secure Management Portal</div>
+            </div>
+          </div>
 
-              <div class="card-body px-4 px-md-5 pt-2 pb-4">
-                <!-- Error Banner -->
-                <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 border-0 rounded-3 shadow-sm" role="alert">
-                  <i class="bi bi-exclamation-triangle-fill fs-5 text-danger"></i>
-                  <div class="small fw-medium">{{ errorMessage }}</div>
-                  <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
-                </div>
+          <h2 class="login-title mb-1">Welcome Back 👋</h2>
+          <p class="login-sub mb-4">Sign in to access your dashboard</p>
 
-                <!-- Quick Demo Accounts Shortcuts -->
-                <div class="mb-4 p-3 quick-fill-box rounded-3">
-                  <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="text-secondary small fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.05em;">
-                      <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Quick Demo Fill:
-                    </span>
-                    <span class="badge bg-white text-muted border shadow-2xs" style="font-size: 0.62rem;">1-Click</span>
-                  </div>
-                  <div class="d-flex flex-wrap gap-2">
-                    <button type="button" class="btn btn-demo-role btn-demo-admin flex-grow-1" (click)="fillCredentials('admin', 'admin123')">
-                      <i class="bi bi-shield-fill"></i>
-                      <span>Admin</span>
-                    </button>
-                    <button type="button" class="btn btn-demo-role btn-demo-faculty flex-grow-1" (click)="fillCredentials('faculty', 'faculty123')">
-                      <i class="bi bi-mortarboard-fill"></i>
-                      <span>Faculty</span>
-                    </button>
-                    <button type="button" class="btn btn-demo-role btn-demo-student flex-grow-1" (click)="fillCredentials('student', 'student123')">
-                      <i class="bi bi-person-badge-fill"></i>
-                      <span>Student</span>
-                    </button>
-                  </div>
-                </div>
+          <!-- Error Banner -->
+          <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 mb-4 border-0 rounded-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+            <div class="small fw-medium">{{ errorMessage }}</div>
+            <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+          </div>
 
-                <!-- Login Form -->
-                <form (ngSubmit)="onSubmit()">
-                  <div class="mb-3">
-                    <label class="form-label small fw-semibold text-dark mb-1">Username / ID</label>
-                    <div class="input-group modern-input-group">
-                      <span class="input-group-text bg-white border-end-0 text-muted">
-                        <i class="bi bi-person"></i>
-                      </span>
-                      <input
-                        type="text"
-                        class="form-control border-start-0"
-                        [(ngModel)]="username"
-                        name="username"
-                        required
-                        placeholder="e.g. admin or student"
-                      />
-                    </div>
-                  </div>
+          <!-- Quick Demo Shortcuts -->
+          <div class="quick-fill-box mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="quick-fill-label"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>Quick Demo Fill</span>
+              <span class="badge-one-click">1-Click</span>
+            </div>
+            <div class="d-flex gap-2">
+              <button type="button" class="demo-btn demo-admin flex-grow-1" (click)="fillCredentials('admin', 'admin123')">
+                <i class="bi bi-shield-fill"></i> Admin
+              </button>
+              <button type="button" class="demo-btn demo-faculty flex-grow-1" (click)="fillCredentials('faculty', 'faculty123')">
+                <i class="bi bi-mortarboard-fill"></i> Faculty
+              </button>
+              <button type="button" class="demo-btn demo-student flex-grow-1" (click)="fillCredentials('student', 'student123')">
+                <i class="bi bi-person-badge-fill"></i> Student
+              </button>
+            </div>
+          </div>
 
-                  <div class="mb-4">
-                    <label class="form-label small fw-semibold text-dark mb-1">Password</label>
-                    <div class="input-group modern-input-group">
-                      <span class="input-group-text bg-white border-end-0 text-muted">
-                        <i class="bi bi-key"></i>
-                      </span>
-                      <input
-                        type="password"
-                        class="form-control border-start-0"
-                        [(ngModel)]="password"
-                        name="password"
-                        required
-                        placeholder="••••••••"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="submit"
-                    class="btn btn-primary w-100 py-2 rounded-pill fw-semibold shadow-md btn-login-submit"
-                    [disabled]="!username || !password || isLoading"
-                  >
-                    <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status"></span>
-                    <i *ngIf="!isLoading" class="bi bi-arrow-right-circle-fill fs-5"></i>
-                    <span>{{ isLoading ? 'Signing in...' : 'Sign In to Dashboard' }}</span>
-                  </button>
-                </form>
-              </div>
-
-              <div class="card-footer border-0 text-center py-3 bg-light bg-opacity-50">
-                <div class="small text-secondary">
-                  Looking for your seat number?
-                  <a routerLink="/seating/search" class="fw-bold text-primary text-decoration-none d-inline-flex align-items-center gap-1 mt-1 ms-1 hover-underline">
-                    <span>Public Seat Finder</span>
-                    <i class="bi bi-arrow-right"></i>
-                  </a>
-                </div>
+          <!-- Login Form -->
+          <form (ngSubmit)="onSubmit()">
+            <div class="form-group mb-3">
+              <label class="form-label-custom">Username / ID</label>
+              <div class="input-wrap">
+                <i class="bi bi-person input-icon"></i>
+                <input type="text" class="form-input" [(ngModel)]="username" name="username" required placeholder="e.g. admin or student" />
               </div>
             </div>
+            <div class="form-group mb-4">
+              <label class="form-label-custom">Password</label>
+              <div class="input-wrap">
+                <i class="bi bi-key input-icon"></i>
+                <input type="password" class="form-input" [(ngModel)]="password" name="password" required placeholder="••••••••" />
+              </div>
+            </div>
+            <button type="submit" class="btn-signin" [disabled]="!username || !password || isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <i *ngIf="!isLoading" class="bi bi-arrow-right-circle-fill me-2 fs-5"></i>
+              {{ isLoading ? 'Signing in...' : 'Sign In to Dashboard' }}
+            </button>
+          </form>
+
+          <div class="text-center mt-4">
+            <span class="text-muted small">Looking for your seat?</span>
+            <a routerLink="/seating/search" class="link-accent ms-1 small">Public Seat Finder →</a>
           </div>
         </div>
       </div>
     </div>
   `,
   styles: [`
-    .login-wrapper {
-      min-height: calc(100vh - 64px);
-      background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-                  radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
-                  #f8fafc;
+    .login-page {
+      display: flex;
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
     }
 
-    .ambient-orb {
+    /* ====== LEFT HERO PANEL ====== */
+    .login-hero {
+      flex: 1.2;
+      position: relative;
+      background: url('/assets/exam-hall-bg.jpg') center center / cover no-repeat;
+      display: flex;
+      align-items: flex-end;
+      padding: 3rem;
+      min-height: 100vh;
+    }
+    .hero-overlay {
       position: absolute;
-      border-radius: 50%;
-      filter: blur(70px);
-      opacity: 0.6;
-      pointer-events: none;
-      animation: floatSlow 12s ease-in-out infinite alternate;
+      inset: 0;
+      background: linear-gradient(
+        160deg,
+        rgba(15, 23, 42, 0.35) 0%,
+        rgba(30, 41, 59, 0.55) 40%,
+        rgba(79, 70, 229, 0.75) 100%
+      );
     }
-    .ambient-orb-1 {
-      width: 320px;
-      height: 320px;
-      background: linear-gradient(135deg, rgba(79, 70, 229, 0.25), rgba(124, 58, 237, 0.25));
-      top: -80px;
-      left: 10%;
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      color: #fff;
+      max-width: 520px;
     }
-    .ambient-orb-2 {
-      width: 280px;
-      height: 280px;
-      background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(14, 165, 233, 0.2));
-      bottom: -60px;
-      right: 15%;
-      animation-delay: -4s;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #e0e7ff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      letter-spacing: 0.04em;
+      margin-bottom: 1.25rem;
     }
-    .ambient-orb-3 {
-      width: 220px;
-      height: 220px;
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(236, 72, 153, 0.15));
-      top: 40%;
-      right: 5%;
-      animation-delay: -8s;
+    .hero-title {
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.15;
+      color: #fff;
+      margin-bottom: 1rem;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .hero-subtitle {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.82);
+      line-height: 1.65;
+      margin-bottom: 1.75rem;
+    }
+    .hero-stats {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
     }
 
-    @keyframes floatSlow {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(20px) scale(1.05); }
-      100% { transform: translateY(-15px) scale(0.95); }
+    /* ====== RIGHT FORM PANEL ====== */
+    .login-form-panel {
+      flex: 0 0 460px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem 2rem;
+      box-shadow: -20px 0 60px rgba(0,0,0,0.08);
+      overflow-y: auto;
+    }
+    .login-form-inner {
+      width: 100%;
+      max-width: 380px;
     }
 
-    .glass-login-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.8) !important;
-      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(226, 232, 240, 0.6);
+    /* Brand */
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
     }
-
-    .brand-shield-wrapper {
-      width: 64px;
-      height: 64px;
-      border-radius: 1.25rem;
+    .brand-shield {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
       background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 8px 20px rgba(79,70,229,0.4);
+      flex-shrink: 0;
     }
-    .glass-login-card:hover .brand-shield-wrapper {
-      transform: scale(1.06) rotate(4deg);
+    .brand-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #1e293b;
+      line-height: 1.2;
+    }
+    .brand-sub {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 500;
     }
 
+    /* Titles */
+    .login-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .login-sub {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    /* Quick demo */
     .quick-fill-box {
-      background: rgba(241, 245, 249, 0.7);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      backdrop-filter: blur(6px);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
     }
-
-    .btn-demo-role {
+    .quick-fill-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+    }
+    .badge-one-click {
+      font-size: 0.62rem;
+      font-weight: 600;
+      background: #fff;
+      color: #94a3b8;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      padding: 0.1rem 0.6rem;
+    }
+    .demo-btn {
       font-size: 0.75rem;
       font-weight: 600;
-      padding: 0.4rem 0.65rem;
-      border-radius: 0.5rem;
+      padding: 0.45rem 0.6rem;
+      border-radius: 8px;
       border: 1px solid transparent;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 0.35rem;
     }
-    .btn-demo-admin {
-      background: rgba(239, 68, 68, 0.08);
-      color: #dc2626;
-      border-color: rgba(239, 68, 68, 0.2);
-    }
-    .btn-demo-admin:hover {
-      background: #dc2626;
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
-    }
+    .demo-admin { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .demo-admin:hover { background: #dc2626; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+    .demo-faculty { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .demo-faculty:hover { background: #d97706; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(217,119,6,0.3); }
+    .demo-student { background: #f0f9ff; color: #0284c7; border-color: #bae6fd; }
+    .demo-student:hover { background: #0284c7; color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(2,132,199,0.3); }
 
-    .btn-demo-faculty {
-      background: rgba(245, 158, 11, 0.08);
-      color: #b45309;
-      border-color: rgba(245, 158, 11, 0.2);
+    /* Form inputs */
+    .form-label-custom {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.35rem;
+      display: block;
     }
-    .btn-demo-faculty:hover {
-      background: #d97706;
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(217, 119, 6, 0.25);
+    .input-wrap {
+      position: relative;
     }
-
-    .btn-demo-student {
-      background: rgba(6, 182, 212, 0.08);
-      color: #0369a1;
-      border-color: rgba(6, 182, 212, 0.2);
+    .input-icon {
+      position: absolute;
+      left: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 1rem;
+      pointer-events: none;
     }
-    .btn-demo-student:hover {
-      background: #0284c7;
-      color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    .form-input {
+      width: 100%;
+      padding: 0.7rem 0.9rem 0.7rem 2.6rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #1e293b;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
     }
-
-    .modern-input-group .input-group-text {
-      background: #ffffff !important;
-      border-color: rgba(203, 213, 225, 0.8);
-      border-top-left-radius: 0.65rem;
-      border-bottom-left-radius: 0.65rem;
-    }
-    .modern-input-group .form-control {
-      background: #ffffff !important;
-      border-color: rgba(203, 213, 225, 0.8);
-      border-top-right-radius: 0.65rem;
-      border-bottom-right-radius: 0.65rem;
-    }
-    .modern-input-group .form-control:focus {
+    .form-input:focus {
       border-color: #6366f1;
-      box-shadow: none;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
     }
-    .modern-input-group:focus-within {
-      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
-      border-radius: 0.65rem;
-    }
-    .modern-input-group:focus-within .input-group-text,
-    .modern-input-group:focus-within .form-control {
-      border-color: #6366f1;
-    }
+    .form-input::placeholder { color: #cbd5e1; }
 
-    .btn-login-submit {
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    /* Submit button */
+    .btn-signin {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+      letter-spacing: 0.01em;
     }
-    .btn-login-submit:hover:not(:disabled) {
+    .btn-signin:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 10px 24px -4px rgba(79, 70, 229, 0.45);
+      box-shadow: 0 12px 28px rgba(79, 70, 229, 0.45);
     }
+    .btn-signin:disabled { opacity: 0.65; cursor: not-allowed; }
 
-    .hover-underline:hover {
-      text-decoration: underline !important;
+    .link-accent {
+      color: #6366f1;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .link-accent:hover { text-decoration: underline; }
+
+    /* Responsive: stack on mobile */
+    @media (max-width: 768px) {
+      .login-hero { display: none; }
+      .login-form-panel {
+        flex: 1;
+        padding: 2rem 1.5rem;
+        box-shadow: none;
+      }
     }
   `]
 })
