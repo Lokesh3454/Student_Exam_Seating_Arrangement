@@ -80,108 +80,172 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
       </div>
 
       <!-- Branch Filter Tabs & Search Bar -->
-      <div class="card border-0 shadow-sm rounded-4 p-3 mb-3">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-          <div class="d-flex flex-wrap align-items-center gap-1">
-            <span class="text-secondary small fw-semibold me-2"><i class="bi bi-funnel-fill text-primary"></i> Filter Branch:</span>
-            <button
-              class="btn btn-sm rounded-pill px-3 transition"
-              [ngClass]="selectedBranch === 'ALL_BRANCHES' ? 'btn-primary' : 'btn-light border text-secondary'"
-              (click)="selectedBranch = 'ALL_BRANCHES'"
-            >
-              All Branches ({{ exams.length }})
-            </button>
-            <button
-              *ngFor="let b of ['CSE', 'ECE', 'MECH', 'CIVIL', 'IT', 'EEE', 'ALL']"
-              class="btn btn-sm rounded-pill px-3 transition"
-              [ngClass]="selectedBranch === b ? 'btn-primary' : 'btn-light border text-secondary'"
-              (click)="selectedBranch = b"
-            >
-              {{ b }} ({{ countExamsByBranch(b) }})
-            </button>
+      <div class="card border-0 shadow-sm rounded-4 p-3 mb-3 bg-white">
+        <!-- Search, Status Filter, and Stats Row -->
+        <div class="row g-2 align-items-center mb-3">
+          <div class="col-md-6 col-lg-5">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text bg-light border-end-0 text-muted">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control bg-light border-start-0 ps-0"
+                placeholder="Search by exam name, subject, branch, hall, date..."
+                [(ngModel)]="searchTerm"
+              />
+              <button
+                *ngIf="searchTerm"
+                class="btn btn-outline-secondary border-start-0 bg-light"
+                type="button"
+                (click)="searchTerm = ''"
+                title="Clear search"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
           </div>
-          <div class="small text-muted">
-            Showing <strong>{{ filteredExams.length }}</strong> of {{ exams.length }} schedules
+
+          <div class="col-sm-6 col-md-3 col-lg-3">
+            <div class="d-flex align-items-center gap-1">
+              <label class="small text-muted text-nowrap fw-semibold me-1"><i class="bi bi-flag me-1"></i>Status:</label>
+              <select class="form-select form-select-sm bg-light" [(ngModel)]="selectedStatus">
+                <option value="ALL">All Statuses</option>
+                <option value="SCHEDULED">Scheduled</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
           </div>
+
+          <div class="col-sm-6 col-md-3 col-lg-4 text-sm-end">
+            <div class="d-inline-flex align-items-center gap-2">
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1 small">
+                Showing <strong>{{ filteredExams.length }}</strong> of {{ exams.length }} schedules
+              </span>
+              <button
+                *ngIf="searchTerm || selectedBranch !== 'ALL_BRANCHES' || selectedStatus !== 'ALL'"
+                class="btn btn-sm btn-link text-danger p-0 text-decoration-none small"
+                (click)="clearFilters()"
+                title="Reset all filters"
+              >
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Branch Pills Row -->
+        <div class="d-flex flex-wrap align-items-center gap-1 pt-2 border-top">
+          <span class="text-secondary small fw-semibold me-2"><i class="bi bi-funnel-fill text-primary"></i> Branch:</span>
+          <button
+            class="btn btn-sm rounded-pill px-3 transition branch-tab-btn"
+            [ngClass]="selectedBranch === 'ALL_BRANCHES' ? 'btn-primary shadow-sm' : 'btn-light border text-secondary'"
+            (click)="selectedBranch = 'ALL_BRANCHES'"
+          >
+            All ({{ exams.length }})
+          </button>
+          <button
+            *ngFor="let b of ['CSE', 'ECE', 'MECH', 'CIVIL', 'IT', 'EEE', 'ALL']"
+            class="btn btn-sm rounded-pill px-3 transition branch-tab-btn"
+            [ngClass]="selectedBranch === b ? 'btn-primary shadow-sm' : 'btn-light border text-secondary'"
+            (click)="selectedBranch = b"
+          >
+            {{ b }} ({{ countExamsByBranch(b) }})
+          </button>
         </div>
       </div>
 
-      <!-- Exams Table -->
-      <div *ngIf="!isLoading" class="card border-0 overflow-hidden exams-table-card">
+      <!-- Exams Table Card -->
+      <div *ngIf="!isLoading" class="card border-0 overflow-hidden exams-table-card shadow-sm rounded-4">
 
-        <!-- Table Summary Bar -->
-        <div class="table-meta-bar d-flex align-items-center justify-content-between px-4 py-2">
-          <div class="d-flex align-items-center gap-3">
-            <span class="table-meta-label"><i class="bi bi-table me-1"></i>{{ filteredExams.length }} Exams</span>
-            <span *ngIf="selectedBranch !== 'ALL_BRANCHES'" class="badge bg-primary rounded-pill">{{ selectedBranch }} filter active</span>
+        <!-- Table Meta / Summary Bar -->
+        <div class="table-meta-bar d-flex flex-wrap align-items-center justify-content-between px-3 px-md-4 py-2 gap-2">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="table-meta-label"><i class="bi bi-table me-1"></i><strong>{{ filteredExams.length }}</strong> Exams Found</span>
+            <span *ngIf="selectedBranch !== 'ALL_BRANCHES'" class="badge bg-primary rounded-pill">{{ selectedBranch }}</span>
+            <span *ngIf="selectedStatus !== 'ALL'" class="badge bg-secondary rounded-pill">{{ selectedStatus }}</span>
+            <span *ngIf="searchTerm" class="badge bg-info text-dark rounded-pill">"{{ searchTerm }}"</span>
           </div>
-          <span class="table-meta-label text-muted">Click any row to manage</span>
+          <span class="table-meta-sub text-muted small"><i class="bi bi-info-circle me-1"></i>All columns fit view. Click row action icons to manage</span>
         </div>
 
         <div class="table-responsive">
           <table class="table align-middle mb-0 exams-table">
             <thead>
               <tr>
-                <th class="col-exam-name">
-                  <div class="th-inner"><i class="bi bi-journal-bookmark-fill text-primary me-1"></i>Exam Name</div>
+                <th class="th-exam-name">
+                  <div class="th-inner"><i class="bi bi-journal-bookmark-fill text-primary me-1"></i>Exam & Subject</div>
                 </th>
-                <th><div class="th-inner"><i class="bi bi-book-fill text-secondary me-1"></i>Subject / Code</div></th>
-                <th><div class="th-inner"><i class="bi bi-diagram-3-fill text-info me-1"></i>Branch</div></th>
-                <th><div class="th-inner"><i class="bi bi-calendar3 text-primary me-1"></i>Date</div></th>
-                <th><div class="th-inner"><i class="bi bi-clock-fill text-warning me-1"></i>Time Slot</div></th>
-                <th><div class="th-inner"><i class="bi bi-building text-success me-1"></i>Halls / Seats</div></th>
-                <th><div class="th-inner"><i class="bi bi-people-fill text-primary me-1"></i>Candidates</div></th>
-                <th><div class="th-inner"><i class="bi bi-flag-fill text-secondary me-1"></i>Status</div></th>
-                <th class="text-end pe-4"><div class="th-inner justify-content-end"><i class="bi bi-gear-fill text-muted me-1"></i>Actions</div></th>
+                <th class="th-branch">
+                  <div class="th-inner"><i class="bi bi-diagram-3-fill text-info me-1"></i>Branch</div>
+                </th>
+                <th class="th-schedule">
+                  <div class="th-inner"><i class="bi bi-calendar3 text-primary me-1"></i>Schedule</div>
+                </th>
+                <th class="th-halls">
+                  <div class="th-inner"><i class="bi bi-building text-success me-1"></i>Halls & Capacity</div>
+                </th>
+                <th class="th-candidates">
+                  <div class="th-inner"><i class="bi bi-people-fill text-primary me-1"></i>Candidates</div>
+                </th>
+                <th class="th-status">
+                  <div class="th-inner"><i class="bi bi-flag-fill text-secondary me-1"></i>Status</div>
+                </th>
+                <th class="th-actions text-end pe-3 sticky-action-col">
+                  <div class="th-inner justify-content-end"><i class="bi bi-gear-fill text-muted me-1"></i>Actions</div>
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let exam of filteredExams; let i = index" class="exam-row">
-                <!-- Exam Name -->
-                <td class="ps-4 col-exam-name">
+                <!-- Exam & Subject Column -->
+                <td class="ps-3 col-exam-name">
                   <div class="exam-row-accent" [ngClass]="'row-accent-' + (i % 5)"></div>
                   <div class="exam-name-cell">
-                    <div class="exam-row-title">{{ exam.examName }}</div>
-                    <span class="exam-row-id">ID #{{ exam.id }}</span>
+                    <a [routerLink]="['/exams/edit', exam.id]"
+                       class="exam-row-title text-truncate text-dark text-decoration-none d-flex align-items-center gap-1 hover-primary"
+                       [title]="'Click to Edit / Update ' + exam.examName">
+                      <span>{{ exam.examName }}</span>
+                      <i class="bi bi-pencil-fill text-primary ms-1 opacity-50 small"></i>
+                    </a>
+                    <div class="exam-row-meta small text-muted text-truncate d-flex align-items-center gap-1 mt-1">
+                      <span class="text-secondary fw-semibold" [title]="exam.subject">{{ exam.subject }}</span>
+                      <span class="text-muted">•</span>
+                      <span class="badge bg-light text-muted border px-1 font-monospace">ID #{{ exam.id }}</span>
+                    </div>
                   </div>
                 </td>
 
-                <!-- Subject -->
-                <td>
-                  <div class="subject-cell">{{ exam.subject }}</div>
-                </td>
-
-                <!-- Branch -->
+                <!-- Branch Column -->
                 <td>
                   <span class="branch-pill" [ngClass]="getBranchBadge(exam.branch)">
                     <i class="bi bi-mortarboard-fill me-1"></i>{{ exam.branch || 'ALL' }}
                   </span>
                 </td>
 
-                <!-- Date -->
+                <!-- Schedule Column (Date + Time) -->
                 <td>
-                  <div class="date-cell">
-                    <i class="bi bi-calendar-event text-primary me-1"></i>
-                    <span class="fw-semibold">{{ exam.examDate }}</span>
+                  <div class="schedule-cell">
+                    <div class="schedule-date fw-semibold text-dark">
+                      <i class="bi bi-calendar-event text-primary me-1"></i>{{ exam.examDate }}
+                    </div>
+                    <div class="schedule-time small text-muted">
+                      <i class="bi bi-clock text-warning me-1"></i>{{ exam.startTime }} – {{ exam.endTime }}
+                    </div>
                   </div>
                 </td>
 
-                <!-- Time Slot -->
-                <td>
-                  <div class="time-cell">
-                    <i class="bi bi-clock text-warning me-1"></i>
-                    <span>{{ exam.startTime }}</span>
-                    <span class="time-sep">–</span>
-                    <span>{{ exam.endTime }}</span>
-                  </div>
-                </td>
-
-                <!-- Halls -->
+                <!-- Halls & Capacity Column -->
                 <td>
                   <div *ngIf="exam.allottedHalls && exam.allottedHalls.length > 0" class="halls-cell">
-                    <div class="d-flex flex-wrap gap-1 mb-1">
-                      <span *ngFor="let h of exam.allottedHalls" class="hall-tag">
-                        <i class="bi bi-building me-1"></i>{{ h.hallNumber }}
+                    <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+                      <span *ngFor="let h of exam.allottedHalls.slice(0, 2)" class="hall-tag">
+                        {{ h.hallNumber }}
+                      </span>
+                      <span *ngIf="exam.allottedHalls.length > 2" class="hall-more-tag" [title]="getAllHallsTooltip(exam.allottedHalls)">
+                        +{{ exam.allottedHalls.length - 2 }}
                       </span>
                     </div>
                     <span class="seats-tag">
@@ -193,24 +257,20 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
                   </span>
                 </td>
 
-                <!-- Candidates -->
+                <!-- Candidates Column -->
                 <td>
                   <div class="candidates-cell">
                     <a [routerLink]="['/exams', exam.id, 'students']"
-                       class="candidates-link" title="View enrolled students">
-                      <i class="bi bi-people-fill me-1"></i>
+                       class="candidates-link"
+                       title="Click to view & enroll candidate roster">
+                      <i class="bi bi-people-fill me-1 text-primary"></i>
                       <strong>{{ exam.registeredStudentsCount || 0 }}</strong>
                       <span class="ms-1 text-muted small">enrolled</span>
                     </a>
-                    <button class="btn btn-xs btn-outline-success rounded-pill ms-1"
-                            (click)="openSingleBranchImportModal(exam)"
-                            title="Import Students CSV">
-                      <i class="bi bi-file-earmark-arrow-up-fill"></i>
-                    </button>
                   </div>
                 </td>
 
-                <!-- Status -->
+                <!-- Status Column -->
                 <td>
                   <span class="status-pill" [ngClass]="getStatusBadge(exam.status)">
                     <i class="bi bi-circle-fill me-1 status-dot"></i>
@@ -218,24 +278,35 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
                   </span>
                 </td>
 
-                <!-- Actions -->
-                <td class="text-end pe-4">
+                <!-- Actions Column (Sticky on right edge) -->
+                <td class="text-end pe-3 td-actions sticky-action-col">
                   <div class="action-btns">
-                    <button class="act-btn act-import" (click)="openSingleBranchImportModal(exam)" title="Import Students CSV">
-                      <i class="bi bi-person-plus-fill"></i>
-                    </button>
-                    <a [routerLink]="['/seating/generate']" [queryParams]="{ examId: exam.id }"
-                       class="act-btn act-generate" title="Generate Seating">
-                      <i class="bi bi-cpu-fill"></i>
+                    <!-- Prominent Edit / Update Button -->
+                    <a [routerLink]="['/exams/edit', exam.id]"
+                       class="btn btn-sm btn-primary rounded-pill px-2 py-1 d-inline-flex align-items-center gap-1 shadow-sm edit-update-btn"
+                       title="Edit / Update Examination Details">
+                      <i class="bi bi-pencil-square"></i>
+                      <span class="fw-bold">Edit / Update</span>
                     </a>
+
+                    <!-- Seating Arrangement Button -->
                     <a [routerLink]="['/seating/arrangement']" [queryParams]="{ examId: exam.id }"
                        class="act-btn act-view" title="View Seating Arrangement">
                       <i class="bi bi-grid-3x3-gap-fill"></i>
                     </a>
-                    <a [routerLink]="['/exams/edit', exam.id]"
-                       class="act-btn act-edit" title="Edit Exam">
-                      <i class="bi bi-pencil-fill"></i>
+
+                    <!-- Generate Seating Button -->
+                    <a [routerLink]="['/seating/generate']" [queryParams]="{ examId: exam.id }"
+                       class="act-btn act-generate" title="Generate Seating Arrangement">
+                      <i class="bi bi-cpu-fill"></i>
                     </a>
+
+                    <!-- Import Students CSV -->
+                    <button class="act-btn act-import" (click)="openSingleBranchImportModal(exam)" title="Import Students CSV for {{ exam.branch || 'Exam' }}">
+                      <i class="bi bi-person-plus-fill"></i>
+                    </button>
+
+                    <!-- Delete Exam -->
                     <button class="act-btn act-delete" (click)="promptDelete(exam)" title="Delete Exam">
                       <i class="bi bi-trash-fill"></i>
                     </button>
@@ -245,16 +316,23 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
 
               <!-- Empty state -->
               <tr *ngIf="filteredExams.length === 0">
-                <td colspan="9">
-                  <div class="empty-state">
+                <td colspan="7">
+                  <div class="empty-state py-5 text-center">
                     <i class="bi bi-calendar-x fs-1 text-muted opacity-40"></i>
-                    <div class="empty-state-title">No exams found</div>
-                    <div class="empty-state-sub">
-                      {{ selectedBranch === 'ALL_BRANCHES' ? 'No exams scheduled yet.' : 'No exams for branch "' + selectedBranch + '".' }}
+                    <div class="empty-state-title fw-bold text-dark mt-2">No exams found</div>
+                    <div class="empty-state-sub text-muted small mt-1">
+                      {{ (searchTerm || selectedStatus !== 'ALL' || selectedBranch !== 'ALL_BRANCHES') ? 'No exams match your active search and filter criteria.' : 'No examinations scheduled yet.' }}
                     </div>
-                    <a routerLink="/exams/new" class="btn btn-primary rounded-pill px-4 mt-3">
-                      <i class="bi bi-calendar-plus-fill me-2"></i>Schedule New Exam
-                    </a>
+                    <div class="d-flex justify-content-center gap-2 mt-3">
+                      <button *ngIf="searchTerm || selectedStatus !== 'ALL' || selectedBranch !== 'ALL_BRANCHES'"
+                              class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                              (click)="clearFilters()">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i>Reset Filters
+                      </button>
+                      <a routerLink="/exams/new" class="btn btn-sm btn-primary rounded-pill px-3 shadow-sm">
+                        <i class="bi bi-calendar-plus-fill me-1"></i>Schedule New Exam
+                      </a>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -263,154 +341,6 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
         </div>
       </div>
     </div>
-
-    <style>
-      /* ====== EXAM LIST TABLE ====== */
-      .exams-table-card {
-        border-radius: 16px !important;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.07) !important;
-      }
-      .table-meta-bar {
-        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-        border-bottom: 1px solid #e2e8f0;
-        font-size: 0.78rem;
-      }
-      .table-meta-label { font-weight: 600; color: #64748b; }
-
-      .exams-table thead tr {
-        background: linear-gradient(135deg, #0f172a, #1e293b);
-      }
-      .exams-table thead th {
-        color: rgba(255,255,255,0.85) !important;
-        font-size: 0.76rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        padding: 0.9rem 0.75rem;
-        border: none !important;
-        white-space: nowrap;
-      }
-      .th-inner {
-        display: flex;
-        align-items: center;
-      }
-      .exams-table tbody tr { transition: background 0.15s, transform 0.15s; }
-      .exams-table tbody tr:hover {
-        background: #f8faff !important;
-        transform: translateX(2px);
-      }
-      .exams-table td {
-        padding: 0.85rem 0.75rem;
-        border-bottom: 1px solid #f1f5f9;
-        vertical-align: middle;
-      }
-
-      /* Row accent */
-      .col-exam-name { position: relative; padding-left: 1.75rem !important; }
-      .exam-row-accent {
-        position: absolute;
-        left: 0; top: 0; bottom: 0;
-        width: 4px;
-        border-radius: 0 2px 2px 0;
-      }
-      .row-accent-0 { background: linear-gradient(180deg, #6366f1, #8b5cf6); }
-      .row-accent-1 { background: linear-gradient(180deg, #f59e0b, #ef4444); }
-      .row-accent-2 { background: linear-gradient(180deg, #10b981, #0891b2); }
-      .row-accent-3 { background: linear-gradient(180deg, #ec4899, #f43f5e); }
-      .row-accent-4 { background: linear-gradient(180deg, #3b82f6, #06b6d4); }
-
-      .exam-name-cell { padding-left: 0.5rem; }
-      .exam-row-title { font-size: 0.88rem; font-weight: 700; color: #1e293b; }
-      .exam-row-id { font-size: 0.7rem; color: #94a3b8; font-weight: 500; }
-
-      .subject-cell {
-        font-size: 0.82rem; font-weight: 600; color: #475569;
-        max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      }
-
-      .branch-pill {
-        font-size: 0.75rem; font-weight: 700;
-        padding: 0.3rem 0.75rem; border-radius: 999px;
-        display: inline-flex; align-items: center;
-        white-space: nowrap;
-      }
-
-      .date-cell, .time-cell {
-        font-size: 0.82rem; color: #374151;
-        display: flex; align-items: center; gap: 0.2rem;
-        white-space: nowrap;
-      }
-      .time-sep { color: #94a3b8; margin: 0 0.2rem; }
-
-      .hall-tag {
-        display: inline-flex; align-items: center;
-        font-size: 0.7rem; font-weight: 700;
-        background: #eff6ff; color: #1d4ed8;
-        border: 1px solid #bfdbfe;
-        padding: 0.15rem 0.5rem; border-radius: 6px;
-      }
-      .seats-tag {
-        display: inline-flex; align-items: center;
-        font-size: 0.68rem; font-weight: 700;
-        background: #f0fdf4; color: #16a34a;
-        border: 1px solid #bbf7d0;
-        padding: 0.12rem 0.5rem; border-radius: 6px;
-      }
-
-      .candidates-cell { display: flex; align-items: center; gap: 0.35rem; }
-      .candidates-link {
-        display: inline-flex; align-items: center;
-        font-size: 0.82rem; font-weight: 600; color: #4f46e5;
-        text-decoration: none;
-        transition: color 0.2s;
-      }
-      .candidates-link:hover { color: #3730a3; }
-
-      .btn-xs {
-        padding: 0.2rem 0.4rem;
-        font-size: 0.7rem;
-      }
-
-      .status-pill {
-        display: inline-flex; align-items: center;
-        font-size: 0.72rem; font-weight: 700;
-        padding: 0.3rem 0.75rem; border-radius: 999px;
-        white-space: nowrap;
-        letter-spacing: 0.04em;
-      }
-      .status-dot { font-size: 0.45rem; }
-
-      /* Action buttons */
-      .action-btns { display: flex; align-items: center; justify-content: flex-end; gap: 0.35rem; }
-      .act-btn {
-        width: 30px; height: 30px;
-        border-radius: 8px;
-        display: inline-flex; align-items: center; justify-content: center;
-        font-size: 0.8rem; cursor: pointer;
-        border: 1.5px solid transparent;
-        transition: all 0.18s ease;
-        text-decoration: none;
-        background: #f8fafc;
-      }
-      .act-import  { color: #16a34a; border-color: #bbf7d0; }
-      .act-import:hover  { background: #16a34a; color: #fff; border-color: #16a34a; transform: translateY(-2px); }
-      .act-generate { color: #0284c7; border-color: #bae6fd; }
-      .act-generate:hover { background: #0284c7; color: #fff; border-color: #0284c7; transform: translateY(-2px); }
-      .act-view  { color: #0891b2; border-color: #a5f3fc; }
-      .act-view:hover  { background: #0891b2; color: #fff; border-color: #0891b2; transform: translateY(-2px); }
-      .act-edit  { color: #4f46e5; border-color: #c7d2fe; }
-      .act-edit:hover  { background: #4f46e5; color: #fff; border-color: #4f46e5; transform: translateY(-2px); }
-      .act-delete { color: #dc2626; border-color: #fecaca; }
-      .act-delete:hover { background: #dc2626; color: #fff; border-color: #dc2626; transform: translateY(-2px); }
-
-      /* Empty state */
-      .empty-state {
-        display: flex; flex-direction: column; align-items: center;
-        padding: 4rem 2rem; color: #94a3b8;
-      }
-      .empty-state-title { font-size: 1.1rem; font-weight: 700; color: #475569; margin-top: 1rem; }
-      .empty-state-sub { font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem; }
-    </style>
 
     <!-- CSV Import Modal Backdrop -->
     <div *ngIf="isImportModalOpen" class="modal fade show d-block" tabindex="-1" style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
@@ -850,7 +780,275 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
       (confirmed)="confirmDelete()"
       (cancelled)="cancelDelete()"
     ></app-confirmation-dialog>
-  `
+  `,
+  styles: [`
+    /* ====== EXAM LIST TABLE ====== */
+    .exams-table-card {
+      border-radius: 16px !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06) !important;
+      border: 1px solid #e2e8f0 !important;
+      background: #ffffff;
+    }
+    .table-meta-bar {
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.8rem;
+    }
+    .table-meta-label { font-weight: 600; color: #475569; }
+
+    /* Custom Responsive Scrollbar */
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table-responsive::-webkit-scrollbar {
+      height: 6px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 999px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 999px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .exams-table {
+      min-width: 880px;
+      width: 100%;
+      margin-bottom: 0;
+    }
+    .exams-table thead tr {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+    }
+    .exams-table thead th {
+      color: rgba(255,255,255,0.9) !important;
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.85rem 0.65rem;
+      border: none !important;
+      white-space: nowrap;
+    }
+    .th-inner {
+      display: flex;
+      align-items: center;
+    }
+
+    .exams-table tbody tr {
+      transition: background 0.15s, transform 0.15s;
+    }
+    .exams-table tbody tr:hover {
+      background: #f8faff !important;
+    }
+    .exams-table td {
+      padding: 0.75rem 0.65rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+
+    /* Row accent bar */
+    .col-exam-name {
+      position: relative;
+      padding-left: 1.5rem !important;
+    }
+    .exam-row-accent {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      border-radius: 0 2px 2px 0;
+    }
+    .row-accent-0 { background: linear-gradient(180deg, #6366f1, #8b5cf6); }
+    .row-accent-1 { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+    .row-accent-2 { background: linear-gradient(180deg, #10b981, #0891b2); }
+    .row-accent-3 { background: linear-gradient(180deg, #ec4899, #f43f5e); }
+    .row-accent-4 { background: linear-gradient(180deg, #3b82f6, #06b6d4); }
+
+    .exam-name-cell {
+      max-width: 260px;
+    }
+    .exam-row-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1e293b;
+      line-height: 1.25;
+    }
+    .exam-row-meta {
+      line-height: 1.2;
+    }
+
+    .branch-pill {
+      font-size: 0.73rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .schedule-cell {
+      white-space: nowrap;
+    }
+    .schedule-date {
+      font-size: 0.82rem;
+      line-height: 1.25;
+    }
+    .schedule-time {
+      font-size: 0.74rem;
+      line-height: 1.25;
+    }
+
+    .hall-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 0.12rem 0.45rem;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .hall-more-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+      padding: 0.1rem 0.35rem;
+      border-radius: 6px;
+      cursor: help;
+    }
+    .seats-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+      padding: 0.1rem 0.45rem;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .candidates-link {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #4f46e5;
+      text-decoration: none;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+    .candidates-link:hover {
+      color: #3730a3;
+      text-decoration: underline;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      white-space: nowrap;
+      letter-spacing: 0.04em;
+    }
+    .status-dot {
+      font-size: 0.42rem;
+    }
+
+    /* Action buttons */
+    .action-btns {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+    .act-btn {
+      width: 29px;
+      height: 29px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+      background: #f8fafc;
+      flex-shrink: 0;
+    }
+    .act-import  { color: #16a34a; border-color: #bbf7d0; }
+    .act-import:hover  { background: #16a34a; color: #fff; border-color: #16a34a; transform: translateY(-1px); }
+    .act-generate { color: #0284c7; border-color: #bae6fd; }
+    .act-generate:hover { background: #0284c7; color: #fff; border-color: #0284c7; transform: translateY(-1px); }
+    .act-view  { color: #0891b2; border-color: #a5f3fc; }
+    .act-view:hover  { background: #0891b2; color: #fff; border-color: #0891b2; transform: translateY(-1px); }
+    .act-edit  { color: #4f46e5; border-color: #c7d2fe; }
+    .act-edit:hover  { background: #4f46e5; color: #fff; border-color: #4f46e5; transform: translateY(-1px); }
+    .act-delete { color: #dc2626; border-color: #fecaca; }
+    .act-delete:hover { background: #dc2626; color: #fff; border-color: #dc2626; transform: translateY(-1px); }
+
+    /* Sticky Actions Column */
+    .sticky-action-col {
+      position: sticky !important;
+      right: 0 !important;
+      z-index: 5;
+      box-shadow: -6px 0 12px rgba(0, 0, 0, 0.05);
+    }
+    .exams-table thead th.sticky-action-col {
+      background: #0f172a !important;
+      z-index: 6;
+    }
+    .exams-table tbody td.sticky-action-col {
+      background: #ffffff;
+    }
+    .exams-table tbody tr:hover td.sticky-action-col {
+      background: #f8faff !important;
+    }
+
+    .edit-update-btn {
+      font-size: 0.74rem;
+      padding: 0.25rem 0.7rem !important;
+      white-space: nowrap;
+      background: linear-gradient(135deg, #2563eb, #3b82f6) !important;
+      border: none !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25) !important;
+    }
+    .edit-update-btn:hover {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4) !important;
+    }
+
+    .hover-primary {
+      cursor: pointer;
+      transition: color 0.15s ease;
+    }
+    .hover-primary:hover {
+      color: #2563eb !important;
+      text-decoration: underline !important;
+    }
+
+    .branch-tab-btn {
+      font-size: 0.78rem;
+    }
+  `]
 })
 export class ExamListComponent implements OnInit {
   exams: Exam[] = [];
@@ -862,6 +1060,8 @@ export class ExamListComponent implements OnInit {
   examToDelete: Exam | null = null;
 
   selectedBranch: string = 'ALL_BRANCHES';
+  searchTerm: string = '';
+  selectedStatus: string = 'ALL';
 
   // CSV Import state
   isImportModalOpen = false;
@@ -894,10 +1094,31 @@ export class ExamListComponent implements OnInit {
   ) {}
 
   get filteredExams(): Exam[] {
-    if (this.selectedBranch === 'ALL_BRANCHES') {
-      return this.exams;
-    }
-    return this.exams.filter(e => (e.branch || 'ALL').toUpperCase() === this.selectedBranch.toUpperCase());
+    return this.exams.filter(e => {
+      const matchBranch = this.selectedBranch === 'ALL_BRANCHES' ||
+        (e.branch || 'ALL').toUpperCase() === this.selectedBranch.toUpperCase();
+      const matchStatus = this.selectedStatus === 'ALL' ||
+        (e.status || '').toUpperCase() === this.selectedStatus.toUpperCase();
+      const query = this.searchTerm.trim().toLowerCase();
+      const matchSearch = !query ||
+        (e.examName && e.examName.toLowerCase().includes(query)) ||
+        (e.subject && e.subject.toLowerCase().includes(query)) ||
+        (e.branch && e.branch.toLowerCase().includes(query)) ||
+        (e.examDate && e.examDate.toLowerCase().includes(query)) ||
+        (e.allottedHalls && e.allottedHalls.some((h: any) => h.hallNumber && h.hallNumber.toLowerCase().includes(query)));
+      return matchBranch && matchStatus && matchSearch;
+    });
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedBranch = 'ALL_BRANCHES';
+    this.selectedStatus = 'ALL';
+  }
+
+  getAllHallsTooltip(halls?: any[]): string {
+    if (!halls || halls.length === 0) return 'All Halls';
+    return halls.map(h => h.hallNumber).join(', ');
   }
 
   get multiBranchSessions(): ConcurrentExamSession[] {

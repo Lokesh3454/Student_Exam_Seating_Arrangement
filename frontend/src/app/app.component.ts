@@ -20,8 +20,8 @@ import { FooterComponent } from './shared/footer/footer.component';
         <app-sidebar *ngIf="showSidebar()" class="d-none d-md-block d-print-none sidebar-sticky-wrapper"></app-sidebar>
 
         <!-- Main Content Area -->
-        <main class="flex-grow-1 p-3 p-md-4 overflow-auto content-area">
-          <div class="container-fluid">
+        <main class="flex-grow-1 p-2 p-md-3 p-xl-4 overflow-auto content-area">
+          <div class="container-fluid px-1 px-md-2 px-xl-3">
             <router-outlet></router-outlet>
           </div>
         </main>
@@ -45,6 +45,9 @@ import { FooterComponent } from './shared/footer/footer.component';
     .content-area {
       min-height: calc(100vh - 64px - 60px);
       background-color: transparent;
+      min-width: 0;
+      max-width: 100%;
+      width: 100%;
     }
   `]
 })

@@ -36,6 +36,10 @@ import { Student, StudentImportSummary } from '../../core/models/student.model';
           </div>
         </div>
         <div class="d-flex flex-wrap gap-2">
+          <a [routerLink]="['/exams/edit', examId]" class="btn btn-outline-primary shadow-sm d-flex align-items-center gap-2" title="Edit or Update Examination Details">
+            <i class="bi bi-pencil-square"></i>
+            <span>Edit / Update Exam</span>
+          </a>
           <button class="btn btn-outline-primary shadow-sm d-flex align-items-center gap-2"
                   [disabled]="isAutoEnrolling"
                   (click)="autoEnrollBranchStudents()">
