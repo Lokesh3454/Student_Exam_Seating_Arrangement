@@ -154,7 +154,6 @@ public class HallServiceImpl implements HallService {
         }
 
         com.exam.seating.dto.response.HallImportSummaryDto summary = new com.exam.seating.dto.response.HallImportSummaryDto();
-        List<Hall> hallsToSave = new ArrayList<>();
         java.util.Set<String> seenHallNumbers = new java.util.HashSet<>();
 
         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(file.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {

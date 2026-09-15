@@ -5,7 +5,6 @@ import com.exam.seating.dto.response.ConflictCheckResponseDto;
 import com.exam.seating.dto.response.SeatingGenerationResponseDto;
 import com.exam.seating.dto.response.StudentImportSummaryDto;
 import com.exam.seating.entity.*;
-import com.exam.seating.entity.enums.AttendanceStatus;
 import com.exam.seating.entity.enums.ExamStatus;
 import com.exam.seating.entity.enums.SeatStatus;
 import com.exam.seating.entity.enums.SeatingStrategy;

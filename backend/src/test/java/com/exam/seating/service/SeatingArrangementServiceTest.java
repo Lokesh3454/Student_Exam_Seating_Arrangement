@@ -2,7 +2,6 @@ package com.exam.seating.service;
 
 import com.exam.seating.dto.request.GenerateSeatingRequestDto;
 import com.exam.seating.dto.response.SeatingGenerationResponseDto;
-import com.exam.seating.dto.response.StudentSeatSearchResponseDto;
 import com.exam.seating.entity.*;
 import com.exam.seating.entity.enums.ExamStatus;
 import com.exam.seating.entity.enums.SeatStatus;

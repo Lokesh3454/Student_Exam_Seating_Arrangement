@@ -1,7 +1,6 @@
 package com.exam.seating.service.impl;
 
 import com.exam.seating.entity.*;
-import com.exam.seating.entity.enums.AttendanceStatus;
 import com.exam.seating.exception.ResourceNotFoundException;
 import com.exam.seating.repository.*;
 import com.exam.seating.service.PdfReportService;
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +37,6 @@ public class PdfReportServiceImpl implements PdfReportService {
 
     private static final Font TITLE_FONT = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, PRIMARY_COLOR);
     private static final Font SUBTITLE_FONT = FontFactory.getFont(FontFactory.HELVETICA, 10, SECONDARY_COLOR);
-    private static final Font SECTION_FONT = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, PRIMARY_COLOR);
     private static final Font HEADER_FONT = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, Color.WHITE);
     private static final Font CELL_FONT = FontFactory.getFont(FontFactory.HELVETICA, 8, Color.DARK_GRAY);
     private static final Font CELL_BOLD_FONT = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, PRIMARY_COLOR);

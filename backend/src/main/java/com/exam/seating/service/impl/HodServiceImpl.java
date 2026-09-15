@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 public class HodServiceImpl implements HodService {
 
     private final StudentRepository studentRepository;
-    private final ExamRepository examRepository;
     private final ExamService examService;
     private final SeatingArrangementRepository seatingArrangementRepository;
     private final IncidentRepository incidentRepository;
