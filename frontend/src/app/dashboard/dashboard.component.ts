@@ -663,89 +663,144 @@ import { StudentSeatSearchResponse } from '../core/models/seating.model';
 
         <!-- Main Content Grid -->
         <div *ngIf="!loading && stats" class="row g-4 mb-4">
-          <!-- Upcoming Exams List (clickable rows) -->
+
+          <!-- ===== UPCOMING EXAMINATIONS – Card Layout ===== -->
           <div class="col-lg-7">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                  <i class="bi bi-calendar3 text-primary"></i> Upcoming Examinations
-                </h5>
-                <a routerLink="/exams" class="text-primary small text-decoration-none fw-semibold">View All</a>
+            <div class="card border-0 h-100 upcoming-exams-card">
+              <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="section-icon-wrap bg-primary-soft">
+                    <i class="bi bi-calendar3-event-fill text-primary"></i>
+                  </div>
+                  <div>
+                    <div class="section-title">Upcoming Examinations</div>
+                    <div class="section-sub">{{ stats.upcomingExams.length }} exam{{ stats.upcomingExams.length !== 1 ? 's' : '' }} scheduled</div>
+                  </div>
+                </div>
+                <a routerLink="/exams" class="btn btn-sm btn-outline-primary rounded-pill px-3">View All</a>
               </div>
-              <div class="card-body p-0">
-                <div class="table-responsive border-0">
-                  <table class="table align-middle mb-0">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Exam Name</th>
-                        <th>Subject</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Candidates</th>
-                        <th class="text-end">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr *ngFor="let exam of stats.upcomingExams"
-                          class="row-clickable"
-                          (click)="navigate('/seating/arrangement/' + exam.id)">
-                        <td class="fw-semibold text-dark">{{ exam.title }}</td>
-                        <td><span class="badge bg-secondary bg-opacity-10 text-secondary">{{ exam.examCode }}</span></td>
-                        <td><i class="bi bi-calendar-event me-1 text-muted"></i>{{ exam.examDate }}</td>
-                        <td><i class="bi bi-clock me-1 text-muted"></i>{{ exam.startTime }} - {{ exam.endTime }}</td>
-                        <td>
-                          <span class="badge bg-primary bg-opacity-10 text-primary">
-                            {{ exam.assignedStudents }} Assigned
-                          </span>
-                        </td>
-                        <td class="text-end" (click)="$event.stopPropagation()">
-                          <a [routerLink]="['/seating/arrangement', exam.id]" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                            Seating
-                          </a>
-                        </td>
-                      </tr>
-                      <tr *ngIf="stats.upcomingExams.length === 0">
-                        <td colspan="6" class="text-center py-4 text-muted">No upcoming exams scheduled.</td>
-                      </tr>
-                    </tbody>
-                  </table>
+
+              <div class="card-body p-3">
+                <!-- Empty State -->
+                <div *ngIf="stats.upcomingExams.length === 0" class="empty-state">
+                  <i class="bi bi-calendar-x fs-1 text-muted opacity-50"></i>
+                  <p class="mt-2 text-muted mb-0">No upcoming exams scheduled yet.</p>
+                </div>
+
+                <!-- Exam Cards -->
+                <div *ngFor="let exam of stats.upcomingExams; let i = index"
+                     class="exam-card-row"
+                     (click)="navigate('/seating/arrangement/' + exam.id)">
+
+                  <!-- Left colored accent bar -->
+                  <div class="exam-accent" [ngClass]="['accent-' + (i % 5)]"></div>
+
+                  <!-- Exam Info -->
+                  <div class="exam-card-body">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                      <div>
+                        <div class="exam-title">{{ exam.title }}</div>
+                        <span class="exam-code-badge">{{ exam.examCode }}</span>
+                      </div>
+                      <span class="exam-status-badge">
+                        <i class="bi bi-circle-fill me-1" style="font-size:0.5rem"></i>SCHEDULED
+                      </span>
+                    </div>
+
+                    <div class="exam-meta-row">
+                      <div class="exam-meta-item">
+                        <i class="bi bi-calendar-event text-primary"></i>
+                        <span>{{ exam.examDate }}</span>
+                      </div>
+                      <div class="exam-meta-item">
+                        <i class="bi bi-clock text-warning"></i>
+                        <span>{{ exam.startTime }} – {{ exam.endTime }}</span>
+                      </div>
+                      <div class="exam-meta-item">
+                        <i class="bi bi-people-fill text-success"></i>
+                        <span><strong>{{ exam.assignedStudents }}</strong> candidates</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Action -->
+                  <div class="exam-card-action" (click)="$event.stopPropagation()">
+                    <a [routerLink]="['/seating/arrangement', exam.id]"
+                       class="btn btn-sm btn-primary rounded-pill px-3">
+                      <i class="bi bi-grid-3x3-gap-fill me-1"></i>Seating
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Branch Distribution Chart / Bars -->
+          <!-- ===== BRANCH DISTRIBUTION – Multi-color vibrant bars ===== -->
           <div class="col-lg-5">
-            <div class="card shadow-sm border-0 h-100">
-              <div class="card-header bg-white py-3">
-                <h5 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                  <i class="bi bi-pie-chart text-info"></i> Candidate Branch Distribution
-                </h5>
-              </div>
-              <div class="card-body p-3">
-                <div *ngIf="getBranchKeys().length === 0" class="text-center text-muted py-4">
-                  No students enrolled yet.
-                </div>
-                <div *ngFor="let branch of getBranchKeys()" class="mb-3">
-                  <div class="d-flex justify-content-between small fw-semibold text-dark mb-1">
-                    <span>{{ branch }}</span>
-                    <span class="text-muted">{{ stats.branchDistribution[branch] }} students</span>
+            <div class="card border-0 h-100 branch-dist-card">
+              <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                  <div class="section-icon-wrap bg-info-soft">
+                    <i class="bi bi-bar-chart-line-fill text-info"></i>
                   </div>
-                  <div class="progress" style="height: 8px;">
-                    <div class="progress-bar bg-primary"
-                         role="progressbar"
-                         [style.width.%]="getBranchPercent(stats.branchDistribution[branch])">
+                  <div>
+                    <div class="section-title">Branch Distribution</div>
+                    <div class="section-sub">{{ stats.totalStudents }} total candidates</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-body p-3">
+                <!-- Empty state -->
+                <div *ngIf="getBranchKeys().length === 0" class="empty-state">
+                  <i class="bi bi-people fs-1 text-muted opacity-50"></i>
+                  <p class="mt-2 text-muted mb-0">No students enrolled yet.</p>
+                </div>
+
+                <!-- Branch Bars -->
+                <div class="branch-list">
+                  <div *ngFor="let branch of getBranchKeys(); let i = index" class="branch-item">
+                    <div class="branch-header">
+                      <div class="branch-label-wrap">
+                        <span class="branch-dot" [ngClass]="['dot-' + (i % 8)]"></span>
+                        <span class="branch-name">{{ branch }}</span>
+                      </div>
+                      <div class="branch-right">
+                        <span class="branch-count">{{ stats.branchDistribution[branch] }}</span>
+                        <span class="branch-pct">{{ getBranchPercent(stats.branchDistribution[branch]) }}%</span>
+                      </div>
+                    </div>
+                    <div class="branch-bar-track">
+                      <div class="branch-bar-fill"
+                           [ngClass]="['bar-' + (i % 8)]"
+                           [style.width.%]="getBranchPercent(stats.branchDistribution[branch])">
+                        <span class="bar-tooltip">{{ stats.branchDistribution[branch] }} students ({{ getBranchPercent(stats.branchDistribution[branch]) }}%)</span>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <hr class="my-3 text-muted">
-
-                <div class="d-grid gap-2">
-                  <button class="btn btn-outline-primary btn-sm rounded-pill card-clickable" (click)="navigate('/students')">
-                    <i class="bi bi-people me-1"></i> Manage All Students
-                  </button>
+                <!-- Summary Footer -->
+                <div *ngIf="getBranchKeys().length > 0" class="branch-summary-footer">
+                  <div class="summary-stat">
+                    <div class="summary-num">{{ getBranchKeys().length }}</div>
+                    <div class="summary-label">Branches</div>
+                  </div>
+                  <div class="summary-divider"></div>
+                  <div class="summary-stat">
+                    <div class="summary-num">{{ stats.totalStudents }}</div>
+                    <div class="summary-label">Students</div>
+                  </div>
+                  <div class="summary-divider"></div>
+                  <div class="summary-stat">
+                    <div class="summary-num">{{ stats.upcomingExamsCount }}</div>
+                    <div class="summary-label">Exams Ahead</div>
+                  </div>
                 </div>
+
+                <button class="btn btn-outline-primary btn-sm w-100 rounded-pill mt-3" (click)="navigate('/students')">
+                  <i class="bi bi-people-fill me-1"></i>Manage All Students
+                </button>
               </div>
             </div>
           </div>
@@ -754,6 +809,7 @@ import { StudentSeatSearchResponse } from '../core/models/seating.model';
     </div>
   `,
   styles: [`
+    /* ====================== SHARED CARD STYLES ====================== */
     .card-clickable {
       cursor: pointer;
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -771,6 +827,189 @@ import { StudentSeatSearchResponse } from '../core/models/seating.model';
       background-color: rgba(99, 102, 241, 0.06) !important;
       transform: translateX(3px);
     }
+
+    /* ====================== CARD HEADER ====================== */
+    .card-header-custom {
+      padding: 1rem 1.25rem;
+      background: #fff;
+      border-bottom: 1px solid #f1f5f9;
+      border-radius: 16px 16px 0 0;
+    }
+    .section-icon-wrap {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .bg-primary-soft { background: rgba(99,102,241,0.1); }
+    .bg-info-soft    { background: rgba(6,182,212,0.1); }
+    .section-title { font-size: 0.95rem; font-weight: 800; color: #0f172a; line-height: 1.2; }
+    .section-sub   { font-size: 0.72rem; color: #94a3b8; font-weight: 500; }
+
+    /* ====================== UPCOMING EXAMS CARDS ====================== */
+    .upcoming-exams-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1rem;
+    }
+    .exam-card-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1px solid #f1f5f9;
+      border-radius: 12px;
+      margin-bottom: 0.65rem;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #fff;
+    }
+    .exam-card-row:hover {
+      border-color: #c7d2fe;
+      box-shadow: 0 4px 16px rgba(99,102,241,0.12);
+      transform: translateX(4px);
+    }
+    /* Left accent bars */
+    .exam-accent {
+      width: 5px; min-height: 80px; align-self: stretch; flex-shrink: 0;
+    }
+    .accent-0 { background: linear-gradient(180deg, #6366f1, #8b5cf6); }
+    .accent-1 { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+    .accent-2 { background: linear-gradient(180deg, #10b981, #0891b2); }
+    .accent-3 { background: linear-gradient(180deg, #ec4899, #f43f5e); }
+    .accent-4 { background: linear-gradient(180deg, #3b82f6, #06b6d4); }
+
+    .exam-card-body {
+      flex: 1;
+      padding: 0.75rem 0.9rem;
+      min-width: 0;
+    }
+    .exam-title {
+      font-size: 0.9rem; font-weight: 700; color: #1e293b;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .exam-code-badge {
+      display: inline-block;
+      font-size: 0.68rem; font-weight: 700;
+      background: #f1f5f9; color: #64748b;
+      border-radius: 6px; padding: 0.1rem 0.5rem;
+      letter-spacing: 0.04em; margin-top: 0.2rem;
+    }
+    .exam-status-badge {
+      display: inline-flex; align-items: center; white-space: nowrap;
+      font-size: 0.65rem; font-weight: 800;
+      background: #dcfce7; color: #16a34a;
+      border-radius: 999px; padding: 0.2rem 0.65rem;
+      letter-spacing: 0.05em;
+    }
+    .exam-meta-row {
+      display: flex; flex-wrap: wrap; gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+    .exam-meta-item {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.78rem; color: #475569;
+    }
+    .exam-meta-item i { font-size: 0.85rem; }
+    .exam-card-action {
+      padding: 0.75rem 0.9rem;
+      flex-shrink: 0;
+    }
+
+    /* ====================== BRANCH DISTRIBUTION ====================== */
+    .branch-dist-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .branch-list {
+      display: flex; flex-direction: column; gap: 0.7rem;
+      max-height: 340px; overflow-y: auto;
+      padding-right: 4px;
+    }
+    .branch-list::-webkit-scrollbar { width: 4px; }
+    .branch-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+    .branch-item { }
+    .branch-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 0.35rem;
+    }
+    .branch-label-wrap { display: flex; align-items: center; gap: 0.5rem; }
+    .branch-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    /* 8 distinct colors */
+    .dot-0 { background: #6366f1; }
+    .dot-1 { background: #f59e0b; }
+    .dot-2 { background: #10b981; }
+    .dot-3 { background: #ec4899; }
+    .dot-4 { background: #3b82f6; }
+    .dot-5 { background: #ef4444; }
+    .dot-6 { background: #8b5cf6; }
+    .dot-7 { background: #06b6d4; }
+
+    .branch-name { font-size: 0.82rem; font-weight: 700; color: #1e293b; }
+    .branch-right { display: flex; align-items: center; gap: 0.5rem; }
+    .branch-count {
+      font-size: 0.82rem; font-weight: 800; color: #1e293b;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 6px; padding: 0.05rem 0.45rem;
+    }
+    .branch-pct { font-size: 0.72rem; font-weight: 700; color: #64748b; min-width: 34px; text-align: right; }
+
+    .branch-bar-track {
+      height: 10px;
+      background: #f1f5f9;
+      border-radius: 999px;
+      overflow: visible;
+      position: relative;
+    }
+    .branch-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      min-width: 6px;
+    }
+    .branch-bar-fill:hover .bar-tooltip { display: block; }
+    .bar-tooltip {
+      display: none;
+      position: absolute;
+      top: -28px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: #fff;
+      font-size: 0.68rem; white-space: nowrap;
+      padding: 0.2rem 0.5rem; border-radius: 6px;
+      z-index: 10;
+    }
+    /* Bar colors matching dots */
+    .bar-0 { background: linear-gradient(90deg, #818cf8, #6366f1); }
+    .bar-1 { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .bar-2 { background: linear-gradient(90deg, #34d399, #10b981); }
+    .bar-3 { background: linear-gradient(90deg, #f472b6, #ec4899); }
+    .bar-4 { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+    .bar-5 { background: linear-gradient(90deg, #f87171, #ef4444); }
+    .bar-6 { background: linear-gradient(90deg, #a78bfa, #8b5cf6); }
+    .bar-7 { background: linear-gradient(90deg, #22d3ee, #06b6d4); }
+
+    /* Summary footer */
+    .branch-summary-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(135deg, #f8faff, #f0f4ff);
+      border: 1px solid #e0e7ff;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      margin-top: 0.85rem;
+    }
+    .summary-stat { text-align: center; }
+    .summary-num { font-size: 1.2rem; font-weight: 900; color: #4f46e5; line-height: 1; }
+    .summary-label { font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.15rem; }
+    .summary-divider { width: 1px; height: 30px; background: #e0e7ff; }
     .icon-circle {
       width: 52px;
       height: 52px;
