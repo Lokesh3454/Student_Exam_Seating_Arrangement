@@ -107,97 +107,155 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
       </div>
 
       <!-- Exams Table -->
-      <div *ngIf="!isLoading" class="card border-0 shadow-sm rounded-4 overflow-hidden">
+      <div *ngIf="!isLoading" class="card border-0 overflow-hidden exams-table-card">
+
+        <!-- Table Summary Bar -->
+        <div class="table-meta-bar d-flex align-items-center justify-content-between px-4 py-2">
+          <div class="d-flex align-items-center gap-3">
+            <span class="table-meta-label"><i class="bi bi-table me-1"></i>{{ filteredExams.length }} Exams</span>
+            <span *ngIf="selectedBranch !== 'ALL_BRANCHES'" class="badge bg-primary rounded-pill">{{ selectedBranch }} filter active</span>
+          </div>
+          <span class="table-meta-label text-muted">Click any row to manage</span>
+        </div>
+
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
+          <table class="table align-middle mb-0 exams-table">
+            <thead>
               <tr>
-                <th class="ps-4">Exam Name</th>
-                <th>Subject</th>
-                <th>Target Branch</th>
-                <th>Exam Date</th>
-                <th>Time Slot</th>
-                <th>Allotted Halls</th>
-                <th>Enrolled Students</th>
-                <th>Status</th>
-                <th class="text-end pe-4">Actions</th>
+                <th class="col-exam-name">
+                  <div class="th-inner"><i class="bi bi-journal-bookmark-fill text-primary me-1"></i>Exam Name</div>
+                </th>
+                <th><div class="th-inner"><i class="bi bi-book-fill text-secondary me-1"></i>Subject / Code</div></th>
+                <th><div class="th-inner"><i class="bi bi-diagram-3-fill text-info me-1"></i>Branch</div></th>
+                <th><div class="th-inner"><i class="bi bi-calendar3 text-primary me-1"></i>Date</div></th>
+                <th><div class="th-inner"><i class="bi bi-clock-fill text-warning me-1"></i>Time Slot</div></th>
+                <th><div class="th-inner"><i class="bi bi-building text-success me-1"></i>Halls / Seats</div></th>
+                <th><div class="th-inner"><i class="bi bi-people-fill text-primary me-1"></i>Candidates</div></th>
+                <th><div class="th-inner"><i class="bi bi-flag-fill text-secondary me-1"></i>Status</div></th>
+                <th class="text-end pe-4"><div class="th-inner justify-content-end"><i class="bi bi-gear-fill text-muted me-1"></i>Actions</div></th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let exam of filteredExams">
-                <td class="ps-4">
-                  <div class="fw-bold text-dark">{{ exam.examName }}</div>
-                  <span class="text-muted small">ID: #{{ exam.id }}</span>
+              <tr *ngFor="let exam of filteredExams; let i = index" class="exam-row">
+                <!-- Exam Name -->
+                <td class="ps-4 col-exam-name">
+                  <div class="exam-row-accent" [ngClass]="'row-accent-' + (i % 5)"></div>
+                  <div class="exam-name-cell">
+                    <div class="exam-row-title">{{ exam.examName }}</div>
+                    <span class="exam-row-id">ID #{{ exam.id }}</span>
+                  </div>
                 </td>
+
+                <!-- Subject -->
                 <td>
-                  <span class="badge bg-secondary-subtle text-secondary">{{ exam.subject }}</span>
+                  <div class="subject-cell">{{ exam.subject }}</div>
                 </td>
+
+                <!-- Branch -->
                 <td>
-                  <span class="badge" [ngClass]="getBranchBadge(exam.branch)">
+                  <span class="branch-pill" [ngClass]="getBranchBadge(exam.branch)">
                     <i class="bi bi-mortarboard-fill me-1"></i>{{ exam.branch || 'ALL' }}
                   </span>
                 </td>
+
+                <!-- Date -->
                 <td>
-                  <i class="bi bi-calendar3 me-1 text-primary"></i>
-                  {{ exam.examDate }}
+                  <div class="date-cell">
+                    <i class="bi bi-calendar-event text-primary me-1"></i>
+                    <span class="fw-semibold">{{ exam.examDate }}</span>
+                  </div>
                 </td>
+
+                <!-- Time Slot -->
                 <td>
-                  <i class="bi bi-clock me-1 text-secondary"></i>
-                  {{ exam.startTime }} - {{ exam.endTime }}
+                  <div class="time-cell">
+                    <i class="bi bi-clock text-warning me-1"></i>
+                    <span>{{ exam.startTime }}</span>
+                    <span class="time-sep">–</span>
+                    <span>{{ exam.endTime }}</span>
+                  </div>
                 </td>
+
+                <!-- Halls -->
                 <td>
-                  <div *ngIf="exam.allottedHalls && exam.allottedHalls.length > 0" class="d-flex flex-wrap gap-1 align-items-center">
-                    <span *ngFor="let h of exam.allottedHalls" class="badge bg-primary-subtle text-primary border border-primary-subtle">
-                      {{ h.hallNumber }}
-                    </span>
-                    <span class="badge bg-success-subtle text-success border border-success-subtle" title="Total Allotted Capacity (5x3 seats)">
-                      {{ exam.allottedCapacity || 0 }} Seats
+                  <div *ngIf="exam.allottedHalls && exam.allottedHalls.length > 0" class="halls-cell">
+                    <div class="d-flex flex-wrap gap-1 mb-1">
+                      <span *ngFor="let h of exam.allottedHalls" class="hall-tag">
+                        <i class="bi bi-building me-1"></i>{{ h.hallNumber }}
+                      </span>
+                    </div>
+                    <span class="seats-tag">
+                      <i class="bi bi-grid-3x3 me-1"></i>{{ exam.allottedCapacity || 0 }} seats
                     </span>
                   </div>
-                  <span *ngIf="!exam.allottedHalls || exam.allottedHalls.length === 0" class="badge bg-light text-muted border">
-                    All Halls (Default)
+                  <span *ngIf="!exam.allottedHalls || exam.allottedHalls.length === 0" class="text-muted small">
+                    <i class="bi bi-building me-1 opacity-50"></i>All Halls
                   </span>
                 </td>
+
+                <!-- Candidates -->
                 <td>
-                  <div class="d-flex align-items-center gap-1">
-                    <a [routerLink]="['/exams', exam.id, 'students']" class="badge bg-primary-subtle text-primary text-decoration-none px-2 py-2 fw-semibold" title="View candidates">
+                  <div class="candidates-cell">
+                    <a [routerLink]="['/exams', exam.id, 'students']"
+                       class="candidates-link" title="View enrolled students">
                       <i class="bi bi-people-fill me-1"></i>
-                      {{ exam.registeredStudentsCount || 0 }} Enrolled
+                      <strong>{{ exam.registeredStudentsCount || 0 }}</strong>
+                      <span class="ms-1 text-muted small">enrolled</span>
                     </a>
-                    <button class="btn btn-sm btn-outline-success py-1 px-2 shadow-sm rounded-pill" (click)="openSingleBranchImportModal(exam)" title="Import {{ exam.branch || 'Branch' }} Students CSV">
+                    <button class="btn btn-xs btn-outline-success rounded-pill ms-1"
+                            (click)="openSingleBranchImportModal(exam)"
+                            title="Import Students CSV">
                       <i class="bi bi-file-earmark-arrow-up-fill"></i>
                     </button>
                   </div>
                 </td>
+
+                <!-- Status -->
                 <td>
-                  <span class="badge" [ngClass]="getStatusBadge(exam.status)">
+                  <span class="status-pill" [ngClass]="getStatusBadge(exam.status)">
+                    <i class="bi bi-circle-fill me-1 status-dot"></i>
                     {{ exam.status }}
                   </span>
                 </td>
+
+                <!-- Actions -->
                 <td class="text-end pe-4">
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-success" (click)="openSingleBranchImportModal(exam)" title="Import {{ exam.branch || 'Branch' }} Students CSV">
-                      <i class="bi bi-file-earmark-person-fill"></i>
+                  <div class="action-btns">
+                    <button class="act-btn act-import" (click)="openSingleBranchImportModal(exam)" title="Import Students CSV">
+                      <i class="bi bi-person-plus-fill"></i>
                     </button>
-                    <a [routerLink]="['/seating/generate']" [queryParams]="{ examId: exam.id }" class="btn btn-outline-success" title="Generate Seating">
+                    <a [routerLink]="['/seating/generate']" [queryParams]="{ examId: exam.id }"
+                       class="act-btn act-generate" title="Generate Seating">
                       <i class="bi bi-cpu-fill"></i>
                     </a>
-                    <a [routerLink]="['/seating/arrangement']" [queryParams]="{ examId: exam.id }" class="btn btn-outline-info" title="View Arrangement">
-                      <i class="bi bi-grid-3x3"></i>
+                    <a [routerLink]="['/seating/arrangement']" [queryParams]="{ examId: exam.id }"
+                       class="act-btn act-view" title="View Seating Arrangement">
+                      <i class="bi bi-grid-3x3-gap-fill"></i>
                     </a>
-                    <a [routerLink]="['/exams/edit', exam.id]" class="btn btn-outline-primary" title="Edit Exam & Allot Halls">
-                      <i class="bi bi-pencil"></i>
+                    <a [routerLink]="['/exams/edit', exam.id]"
+                       class="act-btn act-edit" title="Edit Exam">
+                      <i class="bi bi-pencil-fill"></i>
                     </a>
-                    <button class="btn btn-outline-danger" (click)="promptDelete(exam)" title="Delete Exam">
-                      <i class="bi bi-trash"></i>
+                    <button class="act-btn act-delete" (click)="promptDelete(exam)" title="Delete Exam">
+                      <i class="bi bi-trash-fill"></i>
                     </button>
                   </div>
                 </td>
               </tr>
+
+              <!-- Empty state -->
               <tr *ngIf="filteredExams.length === 0">
-                <td colspan="9" class="text-center py-5 text-muted">
-                  <i class="bi bi-calendar-x fs-1 text-secondary opacity-50 d-block mb-2"></i>
-                  No exams found for the selected branch. Click "Schedule Exam" to create one.
+                <td colspan="9">
+                  <div class="empty-state">
+                    <i class="bi bi-calendar-x fs-1 text-muted opacity-40"></i>
+                    <div class="empty-state-title">No exams found</div>
+                    <div class="empty-state-sub">
+                      {{ selectedBranch === 'ALL_BRANCHES' ? 'No exams scheduled yet.' : 'No exams for branch "' + selectedBranch + '".' }}
+                    </div>
+                    <a routerLink="/exams/new" class="btn btn-primary rounded-pill px-4 mt-3">
+                      <i class="bi bi-calendar-plus-fill me-2"></i>Schedule New Exam
+                    </a>
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -205,6 +263,154 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
         </div>
       </div>
     </div>
+
+    <style>
+      /* ====== EXAM LIST TABLE ====== */
+      .exams-table-card {
+        border-radius: 16px !important;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.07) !important;
+      }
+      .table-meta-bar {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-bottom: 1px solid #e2e8f0;
+        font-size: 0.78rem;
+      }
+      .table-meta-label { font-weight: 600; color: #64748b; }
+
+      .exams-table thead tr {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+      }
+      .exams-table thead th {
+        color: rgba(255,255,255,0.85) !important;
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        padding: 0.9rem 0.75rem;
+        border: none !important;
+        white-space: nowrap;
+      }
+      .th-inner {
+        display: flex;
+        align-items: center;
+      }
+      .exams-table tbody tr { transition: background 0.15s, transform 0.15s; }
+      .exams-table tbody tr:hover {
+        background: #f8faff !important;
+        transform: translateX(2px);
+      }
+      .exams-table td {
+        padding: 0.85rem 0.75rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+      }
+
+      /* Row accent */
+      .col-exam-name { position: relative; padding-left: 1.75rem !important; }
+      .exam-row-accent {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 4px;
+        border-radius: 0 2px 2px 0;
+      }
+      .row-accent-0 { background: linear-gradient(180deg, #6366f1, #8b5cf6); }
+      .row-accent-1 { background: linear-gradient(180deg, #f59e0b, #ef4444); }
+      .row-accent-2 { background: linear-gradient(180deg, #10b981, #0891b2); }
+      .row-accent-3 { background: linear-gradient(180deg, #ec4899, #f43f5e); }
+      .row-accent-4 { background: linear-gradient(180deg, #3b82f6, #06b6d4); }
+
+      .exam-name-cell { padding-left: 0.5rem; }
+      .exam-row-title { font-size: 0.88rem; font-weight: 700; color: #1e293b; }
+      .exam-row-id { font-size: 0.7rem; color: #94a3b8; font-weight: 500; }
+
+      .subject-cell {
+        font-size: 0.82rem; font-weight: 600; color: #475569;
+        max-width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+
+      .branch-pill {
+        font-size: 0.75rem; font-weight: 700;
+        padding: 0.3rem 0.75rem; border-radius: 999px;
+        display: inline-flex; align-items: center;
+        white-space: nowrap;
+      }
+
+      .date-cell, .time-cell {
+        font-size: 0.82rem; color: #374151;
+        display: flex; align-items: center; gap: 0.2rem;
+        white-space: nowrap;
+      }
+      .time-sep { color: #94a3b8; margin: 0 0.2rem; }
+
+      .hall-tag {
+        display: inline-flex; align-items: center;
+        font-size: 0.7rem; font-weight: 700;
+        background: #eff6ff; color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        padding: 0.15rem 0.5rem; border-radius: 6px;
+      }
+      .seats-tag {
+        display: inline-flex; align-items: center;
+        font-size: 0.68rem; font-weight: 700;
+        background: #f0fdf4; color: #16a34a;
+        border: 1px solid #bbf7d0;
+        padding: 0.12rem 0.5rem; border-radius: 6px;
+      }
+
+      .candidates-cell { display: flex; align-items: center; gap: 0.35rem; }
+      .candidates-link {
+        display: inline-flex; align-items: center;
+        font-size: 0.82rem; font-weight: 600; color: #4f46e5;
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      .candidates-link:hover { color: #3730a3; }
+
+      .btn-xs {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.7rem;
+      }
+
+      .status-pill {
+        display: inline-flex; align-items: center;
+        font-size: 0.72rem; font-weight: 700;
+        padding: 0.3rem 0.75rem; border-radius: 999px;
+        white-space: nowrap;
+        letter-spacing: 0.04em;
+      }
+      .status-dot { font-size: 0.45rem; }
+
+      /* Action buttons */
+      .action-btns { display: flex; align-items: center; justify-content: flex-end; gap: 0.35rem; }
+      .act-btn {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 0.8rem; cursor: pointer;
+        border: 1.5px solid transparent;
+        transition: all 0.18s ease;
+        text-decoration: none;
+        background: #f8fafc;
+      }
+      .act-import  { color: #16a34a; border-color: #bbf7d0; }
+      .act-import:hover  { background: #16a34a; color: #fff; border-color: #16a34a; transform: translateY(-2px); }
+      .act-generate { color: #0284c7; border-color: #bae6fd; }
+      .act-generate:hover { background: #0284c7; color: #fff; border-color: #0284c7; transform: translateY(-2px); }
+      .act-view  { color: #0891b2; border-color: #a5f3fc; }
+      .act-view:hover  { background: #0891b2; color: #fff; border-color: #0891b2; transform: translateY(-2px); }
+      .act-edit  { color: #4f46e5; border-color: #c7d2fe; }
+      .act-edit:hover  { background: #4f46e5; color: #fff; border-color: #4f46e5; transform: translateY(-2px); }
+      .act-delete { color: #dc2626; border-color: #fecaca; }
+      .act-delete:hover { background: #dc2626; color: #fff; border-color: #dc2626; transform: translateY(-2px); }
+
+      /* Empty state */
+      .empty-state {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 4rem 2rem; color: #94a3b8;
+      }
+      .empty-state-title { font-size: 1.1rem; font-weight: 700; color: #475569; margin-top: 1rem; }
+      .empty-state-sub { font-size: 0.85rem; color: #94a3b8; margin-top: 0.3rem; }
+    </style>
 
     <!-- CSV Import Modal Backdrop -->
     <div *ngIf="isImportModalOpen" class="modal fade show d-block" tabindex="-1" style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
